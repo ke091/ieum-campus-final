@@ -1,0 +1,221 @@
+.ieum-web-dock,
+.ieum-web-calendar {
+  display: none;
+}
+
+@media (max-width: 1023px), (max-width: 1400px) and (pointer: coarse) {
+  #campusSurface > .ieum-home-extras { margin-top: 14px; }
+
+  #studentPortal:not(.hidden):has(#ieumWorkspace:not(.hidden)) {
+    display: block;
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  #studentPortal .own-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    min-height: 59px;
+    height: auto;
+    padding: max(8px, env(safe-area-inset-top)) 16px 8px;
+  }
+
+  #ieumStudentMain:has(#ieumWorkspace:not(.hidden)) {
+    display: block;
+    width: min(100%, 1100px);
+    padding: 16px max(16px, env(safe-area-inset-right)) calc(75px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+
+  #ieumWorkspace:not(.hidden) { grid-template-columns: minmax(0, 1fr); }
+  #ieumWorkspace .ieum-desk-main { overflow: visible; overscroll-behavior-y: auto; scrollbar-gutter: auto; }
+  #ieumHomeExtras #ieumPinned { display: none; }
+  .ieum-home-hero .ieum-web-calendar { display: inline-flex; }
+
+  #studentPortal .school-identity {
+    gap: 8px;
+    font-size: clamp(12px, 2vw, 14px);
+  }
+
+  #studentPortal .own-topbar .icon-btn,
+  #ieumWebMenu .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ieum-web-dock {
+    position: fixed;
+    z-index: 30;
+    inset: auto 0 0;
+    display: flex;
+    justify-content: center;
+    padding: 5px max(8px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    border-top: 1px solid #d5e4f5;
+    background: #fcfdff;
+    box-shadow: 0 -4px 18px #15355e10;
+  }
+
+  .ieum-web-dock.ieum-web-dock-personal { grid-template-columns: repeat(3,minmax(0,1fr)); }
+
+  .ieum-web-dock button {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 4px;
+    width: min(20%, 126px);
+    min-height: 49px;
+    border-radius: 10px;
+    color: #3b5877;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .ieum-web-dock button svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.65;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .ieum-web-dock button[aria-current="page"],
+  .ieum-web-dock button[aria-expanded="true"] {
+    color: #064784;
+    background: #e6f1ff;
+  }
+
+  .ieum-web-dock .ieum-message-badge {
+    position: absolute;
+    top: 1px;
+    left: calc(50% + 5px);
+  }
+
+  #ieumWebMenu {
+    position: fixed;
+    inset: auto 0 0;
+    width: min(100% - 16px, 460px);
+    max-width: none;
+    max-height: min(82dvh, 680px);
+    margin: auto auto max(8px, env(safe-area-inset-bottom));
+    padding: 0;
+    border: 1px solid #dce8f7;
+    border-radius: 18px;
+    background: #fff;
+    color: #173a60;
+    overscroll-behavior: contain;
+  }
+
+  #ieumWebMenu::backdrop {
+    background: rgb(17 41 72 / 38%);
+  }
+
+  .ieum-web-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px 7px 18px;
+    border-bottom: 1px solid #e2edf8;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #fff;
+  }
+
+  .ieum-web-menu-head h2 { font-size: 17px; }
+  #ieumWebMenu .ieum-rail {
+    position: static;
+    padding: 8px 12px 14px;
+    border: 0;
+  }
+
+  #ieumWebMenu .ieum-rail-brand { display: none; }
+  #ieumWebMenu .ieum-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 7px;
+  }
+
+  #ieumWebMenu .ieum-nav-label { grid-column: 1 / -1; }
+  #ieumWebMenu .ieum-nav button { min-height: 44px; }
+
+  .ieum-workspace .btn,
+  .ieum-workspace .ieum-section-actions .text-btn,
+  dialog.modal .btn { min-height: 42px; }
+
+  dialog.modal form :is(input, select, textarea):not([type="checkbox"], [type="radio"]),
+  .ieum-chat-form textarea,
+  .ieum-dm :is(input, textarea) { min-width: 0; max-width: 100%; font-size: 16px; }
+
+  .ieum-calendar-buttons { grid-template-columns: repeat(3, minmax(37px, auto)); }
+  .ieum-calendar-buttons .btn { width: auto; }
+
+  .ieum-timetable-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1023px), (min-width: 761px) and (max-width: 1400px) and (pointer: coarse) {
+  #ieumWebMenu { width: min(100% - 32px, 560px); }
+  #ieumWebMenu .ieum-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #ieumWorkspace { gap: 16px; }
+  .ieum-home-hero .ieum-header-actions { max-width: 100%; }
+  .ieum-dm-panel { height: clamp(300px, calc(100dvh - 216px), 720px); }
+}
+
+@media (max-width: 760px) {
+  #ieumStudentMain:has(#ieumWorkspace:not(.hidden)) { padding: 12px 12px calc(78px + env(safe-area-inset-bottom)); }
+  #ieumStudentMain { padding-inline: 12px; }
+  #ieumStudentMain:has(#ieumWorkspace.hidden) { padding-bottom: 20px; }
+  #ieumWorkspace { gap: 12px; }
+  .ieum-desk-head.ieum-home-hero {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 17px 15px;
+    min-height: 0;
+  }
+
+  .ieum-home-hero .ieum-header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .ieum-home-hero .ieum-header-actions .btn { padding: 6px 3px; font-size: 12px; }
+  .ieum-desk-head { flex-wrap: wrap; padding: 14px; }
+  .ieum-home-section { margin-top: 12px; padding: 12px; }
+  .ieum-workspace .ieum-participation { padding: 12px; }
+  .ieum-workspace .ieum-participation .campus-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ieum-home-shortcuts .btn { min-height: 44px; }
+  .ieum-home-extras { gap: 12px; }
+
+  dialog.modal {
+    max-width: calc(100% - 20px);
+    max-height: min(90dvh, 100dvh - 16px - env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
+  }
+
+  .ieum-meal-date-controls input,
+  .ieum-schedule-controls input { min-width: 0; max-width: 100%; }
+  .ieum-timetable-scroll .ieum-timetable { min-width: 520px; }
+  .ieum-timetable-controls .field { flex: 1; }
+  .ieum-dm-panel { height: clamp(320px, calc(100dvh - 216px), 670px); }
+
+  .ieum-dm-peer { flex-wrap: wrap; }
+  .ieum-dm-composer { grid-template-columns: 44px 39px minmax(0, 1fr) auto; gap: 4px; padding: 6px; }
+  .ieum-dm-composer .ieum-dm-attach,
+  .ieum-dm-composer #dmEmoji,
+  .ieum-dm-composer .btn { width: auto; min-height: 44px; }
+  .ieum-dm-actions summary { min-height: 34px; min-width: 34px; }
+}
+
+@media (max-width: 390px) {
+  #studentPortal .own-topbar { padding-inline: 11px; }
+  #studentPortal .own-topbar .school-identity span { font-size: 11px; }
+  .ieum-schedule-controls { grid-template-columns: minmax(0, 1fr); }
+  .ieum-schedule-controls .ieum-calendar-buttons { justify-self: end; }
+}

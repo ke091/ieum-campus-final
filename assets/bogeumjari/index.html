@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+ <meta name="color-scheme" content="light">
+ <title>보금자리 · 충남반도체마이스터고등학교</title>
+ <link rel="stylesheet" href="./app.css">
+ <script src="./app.js" type="module"></script>
+</head>
+<body data-ieum="true">
+ <section id="ieum-message" class="signin" hidden aria-live="polite">
+  <div class="signin-card"><h1>보금자리</h1><p id="ieum-status">기숙사 기록을 불러오는 중입니다.</p></div>
+ </section>
+ <div id="shell" class="shell" hidden>
+  <aside class="sidebar">
+   <div class="brand"><span class="brand-mark" aria-hidden="true"><span></span></span><div><strong>보금자리</strong><p>기숙사 관리</p></div></div>
+   <nav id="nav" aria-label="기숙사 메뉴"></nav>
+   <div class="sidebar-bottom"><small>충남반도체마이스터고등학교</small></div>
+  </aside>
+  <main class="main" id="main">
+   <header class="topbar">
+    <span class="top-label">충남반도체마이스터고등학교</span>
+    <div class="account"><strong id="account-name"></strong><button class="button small plain" type="button" data-action="refresh" aria-label="기록 새로고침">↻</button><button id="dorm-logout" class="button small plain" type="button" data-action="logout">로그아웃</button></div>
+   </header>
+   <div class="content" id="content"></div>
+  </main>
+ </div>
+ <dialog id="dialog" aria-labelledby="dialog-title">
+  <form id="dialog-form">
+   <header class="dialog-head"><h2 id="dialog-title"></h2><button type="button" class="icon-button" aria-label="닫기" data-action="close">×</button></header>
+   <div id="dialog-body"></div>
+   <p id="dialog-error" class="form-error" role="alert"></p>
+   <footer id="dialog-foot" class="dialog-foot"><button type="button" data-action="close" class="button secondary">취소</button><button type="submit" class="button primary" id="dialog-submit">저장</button></footer>
+  </form>
+ </dialog>
+ <div id="notice" class="notice" role="status" hidden></div>
+</body>
+</html>
