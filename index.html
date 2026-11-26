@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="color-scheme" content="light"><meta name="robots" content="noindex,nofollow">
 <title>이음 · 충남반도체마이스터고등학교</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Kd4ex8/7Lb3B4xDgyskhRvK3BU8/KYy7DxQMizqY4E0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' blob:; connect-src 'self' https://bareun-csmh-student-care.kimm2112.chatgpt.site https://raw.githubusercontent.com; base-uri 'none'; object-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-EnN1BEa50B4umDieVZO0kgy8srSSOHYe4ZpmNU0c4eM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' blob:; connect-src 'self' https://bareun-csmh-student-care.kimm2112.chatgpt.site https://raw.githubusercontent.com; base-uri 'none'; object-src 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="description" content="충남반도체마이스터고등학교의 소통 공간 이음에서 교내 소식, 학사일정, 시간표와 급식을 확인해요.">
   <meta property="og:title" content="이음 · 충남반도체마이스터고등학교">
@@ -999,7 +999,7 @@ html{scrollbar-gutter:stable}
 <form id="teacherLoginForm" class="login-form hidden">
   <h2>이음 선생님 로그인</h2>
   <div class="stack">
-    <label class="field">이름<input name="name" maxlength="72" autocomplete="username" required></label>
+    <label class="field">본인 이름<input name="name" maxlength="72" autocomplete="username" required></label>
     <label class="field">비밀번호<input name="password" type="password" autocomplete="current-password" required></label>
   </div>
   <label class="ieum-remember-login"><input type="checkbox" data-keep-signed-in> 이 기기에서 로그인 유지</label>
@@ -2141,7 +2141,7 @@ async function teacherLogin(event) {
     const keepSignedIn=form.querySelector('[data-keep-signed-in]').checked;
     const result=await post('/login',{kind:'teacher',name,password,keepSignedIn});
     if(location.hash==='#teacher')history.replaceState(history.state,'',location.pathname+location.search);
-    rememberSuccessfulLogin('teacher',remember,result.user,password);
+    rememberSuccessfulLogin('teacher',remember,result.user,password,name.trim());
     applySession(result,keepSignedIn);
     form.elements.password.value='';
     openCampusPortal();
@@ -5078,10 +5078,10 @@ function loadSavedLogin(kind) {
   sendSavedLogin('load',kind,null,request);
 }
 
-function rememberSuccessfulLogin(kind,remember,account,password) {
+function rememberSuccessfulLogin(kind,remember,account,password,loginName) {
   if (!remember || !account?.subjectId) return;
   sendSavedLogin('save',kind,{
-    AccountId:account.subjectId,Username:kind==='student'?account.studentId:kind==='teacher'?account.name.replace(/ 선생님$/,''):account.name,
+    AccountId:account.subjectId,Username:kind==='student'?account.studentId:kind==='teacher'?loginName:account.name,
     RoleId:account.roleId||'',Department:account.department||'',Password:password,
   });
 }
@@ -5116,7 +5116,7 @@ function initSavedLogin() {
       $('studentLoginPassword').value=credentials.Password;
     } else if (kind==='teacher') {
       const teacherNames={principal:'교장선생님','vice-principal':'교감선생님'};
-      form.elements.name.value=teacherNames[credentials.RoleId]||credentials.Username;
+      form.elements.name.value=credentials.Username||teacherNames[credentials.RoleId]||'';
       form.elements.password.value=credentials.Password;
     } else {
       form.elements.position.value=[credentials.RoleId,credentials.Department].filter(Boolean).join('|');
