@@ -200,7 +200,7 @@ function settings(){
 function draw(){
  const isStaff=state.grant.roster;
  const list=isStaff?tabs:studentTabs;
- $('account-name').textContent=state.user.name+' · '+(isStaff?'교직원':'학생');
+ $('account-name').textContent=state.user.name+' · '+(isStaff?roleLabels[state.user.role]:'학생');
  $('nav').innerHTML=Object.entries(list).map(([key,[glyph,caption]])=>`<button type="button" class="nav-item" data-nav="${key}" ${view===key?'aria-current="page"':''}><span class="nav-glyph" aria-hidden="true">${glyph}</span>${caption}</button>`).join('');
  $('content').innerHTML=({home:dashboard,students:studentsView,penalties:penaltiesView,attendance:attendanceView,settings})[view]();
  renderStudentsIfNeeded();

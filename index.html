@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="color-scheme" content="light"><meta name="robots" content="noindex,nofollow">
 <title>이음 · 충남반도체마이스터고등학교</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-lhHDVeXP2xYSjAzytZdrGZewZpbnK9XAt0KoQelQ2Co='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' blob:; connect-src 'self' https://bareun-csmh-student-care.kimm2112.chatgpt.site https://raw.githubusercontent.com; base-uri 'none'; object-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Kd4ex8/7Lb3B4xDgyskhRvK3BU8/KYy7DxQMizqY4E0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; frame-src 'self' blob:; connect-src 'self' https://bareun-csmh-student-care.kimm2112.chatgpt.site https://raw.githubusercontent.com; base-uri 'none'; object-src 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="description" content="충남반도체마이스터고등학교의 소통 공간 이음에서 교내 소식, 학사일정, 시간표와 급식을 확인해요.">
   <meta property="og:title" content="이음 · 충남반도체마이스터고등학교">
@@ -271,6 +271,10 @@ html{scrollbar-gutter:stable}
 .ieum-closed-suggestions>.campus-items{margin-top:9px}
 .ieum-wordmark{color:#023f8f}
 .ieum-staff-mode>.sidebar,.ieum-staff-mode>#appShell{display:none!important}
+.bareun-teacher-view #sidebar :is(.sidebar-bottom .nav-list,[data-view="accounts"]),
+.bareun-teacher-view #appShell :is(#headingAction,#studentRegisterButton,[data-action^="print-"],[data-action="export-records"]),
+.bareun-teacher-view #view-records :is(th,td):nth-child(5),
+.bareun-teacher-view #historyDialog :is(.modal-footer,.table-actions){display:none!important}
 .ieum-staff-return{margin-bottom:14px;justify-content:flex-start}
 .student-mode #ownBrand[data-program=bareun]{color:#184d42}
 #scheduleDialog,#councilAccountsDialog{width:min(680px,calc(100% - 24px));max-width:680px}
@@ -1265,10 +1269,10 @@ let ownStudent=null,ownUpdatedAt=null,studentDemo=false,portalTimer=null,student
 function post(route,data){return api(route,{method:'POST',body:JSON.stringify(data)})}
 function load(){students=[];prefs={};user=null;if(!service.enabled){try{const raw=localStorage.getItem(KEY);if(raw)students=normalizeStudents(JSON.parse(raw))}catch{storageBlocked=true}}}
 function savePrefs(next){prefs=next;return true}
-async function persist(next){if(ownStudent)return false;if(isDemo){students=next;writeVersion++;return true}if(!service.enabled||!canUseManagedBareun()){toast('학생회 계정으로 로그인하세요.','error');return false}if(service.saving){toast('저장 중입니다.','error');return false}service.saving=true;$('saveState').textContent='저장 중';try{const result=await api('/admin/data',{method:'PUT',body:JSON.stringify({students:next,version:service.version})});service.version=result.version;students=normalizeStudents(next);writeVersion++;$('saveState').textContent='저장됨';return true}catch(error){if(error.status===409)await loadSchool();else $('saveState').textContent='저장 실패';toast(error.message,'error');return false}finally{service.saving=false}}
-async function loadSchool(){const data=await api('/admin/data');students=normalizeStudents(data.students);service.version=data.version;storageBlocked=false;$('saveState').textContent='저장됨';renderAll()}
+async function persist(next){if(ownStudent)return false;if(isDemo){students=next;writeVersion++;return true}if(!service.enabled||!canEditManagedBareun()){toast('학생회 계정으로 로그인하세요.','error');return false}if(service.saving){toast('저장 중입니다.','error');return false}service.saving=true;$('saveState').textContent='저장 중';try{const result=await api('/admin/data',{method:'PUT',body:JSON.stringify({students:next,version:service.version})});service.version=result.version;students=normalizeStudents(next);writeVersion++;$('saveState').textContent='저장됨';return true}catch(error){if(error.status===409)await loadSchool();else $('saveState').textContent='저장 실패';toast(error.message,'error');return false}finally{service.saving=false}}
+async function loadSchool(){const token=service.token,data=await api('/admin/data');if(token!==service.token)return;students=normalizeStudents(data.students);service.version=data.version;storageBlocked=false;$('saveState').textContent=teacherAccount()?'조회 전용':'저장됨';renderAll()}
 function renderProfile(){$('profileName').textContent=user?.name||'바른';$('profileRole').textContent=user?.name===user?.role?'':(user?.role||'');$('profileAvatar').textContent=user?.name?.slice(0,1)||'바';$('navStudentCount').textContent=students.length;$('footerCount').textContent=`학생 ${students.length}명 / 기록 ${allRecords().length}건`;if(view==='settings'){$('settingName').value=user?.name||'';$('settingRole').innerHTML=`<option>${esc(user?.role||'')}</option>`;$('settingRole').disabled=true;$('schoolName').value=SCHOOL_NAME}}
-function switchView(next){if(ownStudent||!TITLES[next])return;recordManagedView(next);view=next;document.querySelectorAll('.view').forEach(el=>el.classList.toggle('hidden',el.id!==`view-${next}`));document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.toggle('active',b.dataset.view===next);if(b.dataset.view===next)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});$('pageTitle').textContent=TITLES[next];$('headingAction').classList.toggle('hidden',!['dashboard','records'].includes(next));$('headingAction').dataset.action='warning-add';$('headingAction').innerHTML=icon('plus')+'<span>기록 등록</span>';$('managePeriod').classList.toggle('hidden',!['dashboard','students','records'].includes(next));if(next==='dashboard'||next==='students'){$(next==='dashboard'?'dashboardTableMount':'studentsTableMount').appendChild($('studentTablePanel'));tablePage=1;renderStudentTable()}if(next==='records'){recordPage=1;renderRecords()}if(next==='reports')renderReports();if(next==='data')renderDataInfo();if(next==='accounts')loadAccounts().catch(e=>toast(e.message,'error'));renderProfile();closeMenu()}
+function switchView(next){if(ownStudent||!TITLES[next]||(teacherAccount()&&['accounts','data','settings'].includes(next)))return;recordManagedView(next);view=next;document.querySelectorAll('.view').forEach(el=>el.classList.toggle('hidden',el.id!==`view-${next}`));document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.toggle('active',b.dataset.view===next);if(b.dataset.view===next)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});$('pageTitle').textContent=TITLES[next];$('headingAction').classList.toggle('hidden',!['dashboard','records'].includes(next));$('headingAction').dataset.action='warning-add';$('headingAction').innerHTML=icon('plus')+'<span>기록 등록</span>';$('managePeriod').classList.toggle('hidden',!['dashboard','students','records'].includes(next));if(next==='dashboard'||next==='students'){$(next==='dashboard'?'dashboardTableMount':'studentsTableMount').appendChild($('studentTablePanel'));tablePage=1;renderStudentTable()}if(next==='records'){recordPage=1;renderRecords()}if(next==='reports')renderReports();if(next==='data')renderDataInfo();if(next==='accounts')loadAccounts().catch(e=>toast(e.message,'error'));renderProfile();closeMenu()}
 function renderAll(){updateYearOptions();updateClassOptions();renderProfile();renderStats();renderStudentTable();renderRecords();renderReports();renderDataInfo();if($('historyDialog').open&&activeStudent)renderHistory()}
 
 
@@ -1297,7 +1301,7 @@ async function refreshOwn(){
     throw error;
   }
 }
-function showOwnPortal(initial='home',target,fromBack=false){campus.bareun=null;document.body.classList.remove('auth-mode');document.body.classList.add('student-mode');$('studentPortal').classList.remove('hidden');closeMenu();clearInterval(portalTimer);if(!studentDemo&&ownStudent)portalTimer=setInterval(()=>{if(!document.hidden)refreshOwn().catch(()=>{})},30000);$('skipLink').href='#ieumStudentMain';renderOwn();showCampus(initial,'',target,fromBack);window.scrollTo(0,0)}
+function showOwnPortal(initial='home',target,fromBack=false){campus.bareun=null;document.body.classList.remove('auth-mode','bareun-teacher-view');document.body.classList.add('student-mode');$('studentPortal').classList.remove('hidden');closeMenu();clearInterval(portalTimer);if(!studentDemo&&ownStudent)portalTimer=setInterval(()=>{if(!document.hidden)refreshOwn().catch(()=>{})},30000);$('skipLink').href='#ieumStudentMain';renderOwn();showCampus(initial,'',target,fromBack);window.scrollTo(0,0)}
 
 
 
@@ -1574,7 +1578,7 @@ const canOpenDocumentRoom = () => councilAccount() && !['teacher', 'teacher_1', 
 const personalAccount = () => service.user?.kind === 'personal';
 const studentLikeAccount = () => Boolean(ownStudent || teacherAccount());
 const campusParticipant = () => studentLikeAccount() || councilAccount();
-const canUseBus = () => studentLikeAccount() || canManageCampusData();
+const canUseBus = () => ['student','teacher'].includes(service.user?.kind);
 const canOpenDorm = () => Boolean(service.token && ['student','teacher'].includes(service.user?.kind));
 let dormOpenCount = 0;
 function openDorm() {
@@ -1610,7 +1614,8 @@ window.addEventListener('message', async event => {
 });
 const canManageCampusData = () => councilAccount() && service.user.canModerate === true;
 const canManageSchool = () => service.user?.kind === 'staff' || canManageCampusData();
-const canUseManagedBareun = () => councilAccount() || service.user?.kind==='staff';
+const canEditManagedBareun = () => councilAccount() || service.user?.kind==='staff';
+const canUseManagedBareun = () => teacherAccount() || canEditManagedBareun();
 const signedInCampusPage = () => canUseBus() && new URLSearchParams(location.search).get('program')==='gilbeot' ? 'bus' : 'home';
 
 function syncBusLocation(bus) {
@@ -1635,6 +1640,7 @@ function setCouncilAccess(enabled) {
 }
 
 function resetCampus() {
+  document.body.classList.remove('bareun-teacher-view');
   closeDialog('ieumDormDialog');
   stopChat();
   stopDm();
@@ -1821,7 +1827,7 @@ async function showCampus(page, message = '', target, fromBack = false) {
   else delete password.dataset.action;
   renderCampusIdentity();
   const bareun = $('ieumBareunEntry');
-  bareun.classList.toggle('hidden',teacherAccount()||personal);
+  bareun.classList.toggle('hidden',personal);
   if (canUseManagedBareun()) { bareun.setAttribute('data-ieum-bareun',''); bareun.removeAttribute('data-campus-tab'); }
   else { bareun.dataset.campusTab = 'discipline'; bareun.removeAttribute('data-ieum-bareun'); }
   $('ownBrand').dataset.program = discipline ? 'bareun' : bus ? 'bus' : 'ieum';
@@ -1914,7 +1920,7 @@ function showCampusExtras(request) {
 }
 
 function showStaffHome(open) {
-  if (open && councilAccount()) {
+  if (open && (councilAccount() || teacherAccount())) {
     showOwnPortal('home');
     return;
   }
@@ -1934,19 +1940,20 @@ function showStaffHome(open) {
 
 async function openManagedBareun(next = 'dashboard') {
   if (!canUseManagedBareun()) return;
-  if (!councilAccount()) { showStaffHome(false); return; }
+  if (service.user.kind==='staff') { showStaffHome(false); return; }
   try {
-    const request = campus.request;
+    const request = campus.request, token = service.token;
     user = service.user;
     await loadSchool();
-    if (request !== campus.request || !councilAccount()) return;
+    if (request !== campus.request || token !== service.token) return;
     stopChat();
     stopDm();
     stopInlineEventPreviews();
     clearTimeout(campus.refresh);
     campus.request++;
     campus.bareun = {view:'',history:[],restoring:false};
-    $('managedDutyRegister').classList.remove('hidden');
+    $('managedDutyRegister').classList.toggle('hidden',!councilAccount());
+    document.body.classList.toggle('bareun-teacher-view',teacherAccount());
     syncCampusBack();
     document.body.classList.remove('student-mode');
     $('studentPortal').classList.add('hidden');
@@ -2407,7 +2414,7 @@ function initCampus() {
     updateDepartment(select);
   }
   const positions=$('councilLoginForm').elements.position;
-  const mainPositions=Object.entries(councilRoleLabels).filter(([role])=>!['head','member'].includes(role));
+  const mainPositions=Object.entries(councilRoleLabels).filter(([role])=>!['head','member','vice','teacher'].includes(role));
   positions.innerHTML='<option value="">직책 선택</option>'+
     mainPositions.map(([role,label])=>`<option value="${role}">${label}</option>`).join('')+
     councilDepartmentNames.map(department=>`<optgroup label="${department}">
@@ -2763,11 +2770,14 @@ function weekPrompt() {
 }
 
 function workspaceHome() {
-  const dorm = canOpenDorm() ? `<section class="ieum-desk-section ieum-home-section" aria-label="교내 프로그램">
-    <header><h2>교내 프로그램</h2></header><div class="ieum-program-grid">
-    <button type="button" class="ieum-program ieum-dorm-card" data-ieum-dorm><span class="ieum-program-icon">${icon('home')}</span>
+  const dorm = canOpenDorm() ? `<button type="button" class="ieum-program ieum-dorm-card" data-ieum-dorm><span class="ieum-program-icon">${icon('home')}</span>
       <span><strong>보금자리</strong><span class="ieum-program-note">기숙사 관리</span></span>
-      <svg class="ieum-program-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button></div></section>` : '';
+      <svg class="ieum-program-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>` : '';
+  const teacherBareun = teacherAccount() ? `<button type="button" class="ieum-program" data-ieum-bareun>
+    <span class="ieum-program-icon">${icon('leaf')}</span><span><strong>바른</strong><span class="ieum-program-note">학생 생활지도</span></span>
+    <svg class="ieum-program-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>` : '';
+  const programs = dorm || teacherBareun ? `<section class="ieum-desk-section ieum-home-section" aria-label="교내 프로그램">
+    <header><h2>교내 프로그램</h2></header><div class="ieum-program-grid">${teacherBareun}${dorm}</div></section>` : '';
   const identity = ownStudent ? ownStudent.name + ' · 학번 ' + ownStudent.id : teacherAccount()?service.user.name:
     [service.user.department, service.user.role, service.user.name === service.user.role ? '' : service.user.name].filter(Boolean).join(' · ');
   const actions = `<div class="ieum-header-actions">
@@ -2792,7 +2802,7 @@ function workspaceHome() {
       ${canPublish()?editorButton('events','행사 올리기'):''}<button type="button" class="text-btn" data-campus-tab="events">안내판 보기</button></div></header>
     <div id="workspaceEvents" class="campus-items" aria-live="polite"><p class="small muted">불러오는 중…</p></div></section>
     ${participationCards()}
-    ${dorm}
+    ${programs}
     ${shortcuts}
     <section class="ieum-desk-section ieum-home-section"><header><h2>이번 주 한마디</h2></header>
     <p>${weekPrompt()}</p><button type="button" class="text-btn" data-ieum-prompt="question">자유 소통에 한마디 남기기</button></section>`;
@@ -4179,7 +4189,7 @@ function clearDutyImage() {
   dutyView.url = '';
 }
 
-const canViewDutyRoster = () => councilAccount() || service.user?.kind==='staff';
+const canViewDutyRoster = () => canUseManagedBareun();
 
 async function loadDutyRoster(message = '') {
   if (!canViewDutyRoster()) return;
